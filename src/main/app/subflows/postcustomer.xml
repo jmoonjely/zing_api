@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+<flow name="postcustomerFlow">
+        <logger message="#[flowVars.logprefix] - POST" level="INFO" doc:name="Logger"/>
+        <byte-array-to-object-transformer returnClass="java.lang.String" doc:name="Byte Array to Object"/>
+        <json:json-to-object-transformer returnClass="au.com.zing.Customer" doc:name="JSON to Object"/>
+         <invoke object-ref="zingDBFacade" method="createCustomer" doc:name="DBFacade for DB processing" methodArguments="#[payload]"/>
+        <scripting:component doc:name="Script">
+            <scripting:script engine="Groovy"><![CDATA[if(payload instanceof org.mule.transport.NullPayload){
+ throw new org.mule.module.apikit.exception.NotFoundException("Does not exist!");
+ }
+	]]></scripting:script>
+        </scripting:component>
+       <set-payload value="#[flowVars.key]" doc:name="Set Payload"/>
+        <flow-ref name="pushToCustomerQueueFlow" doc:name="Flow Ref- PUSH TO QUEUE FOR sync"/>
+        <logger message="#[flowVars.logprefix] - get customer completed" level="INFO" doc:name="Log Completed"/>
+    </flow>
+</mule>

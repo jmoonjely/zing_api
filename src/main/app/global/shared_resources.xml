@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	
+	<!-- This is a bean class is only used as a facade to hide the DB processing in this POC.
+        This class will take care of all the Database processing operations -->
+	<spring:beans>
+		<spring:bean id="zingDBFacade" name="zingDBFacade" class="au.com.zing.ZingDBFacade" scope="singleton" />
+	</spring:beans>
+	
+	<!-- This VM simulates as a Message queue in this POC.
+        This will be replaced with a proper JMS implementation for scalability, reliability and other benefits of using queues-->
+	<vm:connector name="QueueConnector" validateConnections="true"
+		doc:name="VM" />
+</mule>

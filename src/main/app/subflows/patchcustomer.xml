@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+<flow name="patchcustomerFlow">
+        <logger message="#[flowVars.logprefix] - PATCH" level="INFO" doc:name="Logger"/>
+        <set-variable variableName="key"
+                  value="#[message.inboundProperties.'http.uri.params'.id]" 
+                  doc:name="Variable"/>
+        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
+        <logger message="#[flowVars.logprefix] - #[payload]" level="INFO" doc:name="Logger"/>
+      <!--******************
+          This methods needs to be implemented based on the op values like this one for remove { "op":"remove","value":"lastname"}
+	     this one for repalce { "op":"replace", "path": "/customer/{id}/lastname", "value":"Newtom"}
+      **********************  -->
+        <invoke object-ref="zingDBFacade" method="patchCustomers" doc:name="PATCH Customers" methodArguments="#[flowVars.key], #[payload]"/>
+        <scripting:component doc:name="Script">
+            <scripting:script engine="Groovy"><![CDATA[if(payload instanceof org.mule.transport.NullPayload){
+ throw new org.mule.module.apikit.exception.NotFoundException("Does not exist!");
+ }
+	]]></scripting:script>
+        </scripting:component>
+        <set-payload value="#[flowVars.key]" doc:name="Set Payload"/>
+        <flow-ref name="pushToCustomerQueueFlow" doc:name="Flow Ref- PUSH TO QUEUE FOR sync"/>
+        <logger message="#[flowVars.logprefix] - Result returned" level="INFO" doc:name="Logger"/>
+    </flow>
+</mule>
