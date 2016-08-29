@@ -9,6 +9,8 @@
 http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
 <flow name="patchcustomerFlow">
         <logger message="#[flowVars.logprefix] - PATCH" level="INFO" doc:name="Logger"/>
         <set-variable variableName="key"
@@ -16,13 +18,15 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
                   doc:name="Variable"/>
         <byte-array-to-string-transformer doc:name="Byte Array to String"/>
         <logger message="#[flowVars.logprefix] - #[payload]" level="INFO" doc:name="Logger"/>
+        
       <!--******************
           This methods needs to be implemented based on the op values like this one for remove { "op":"remove","value":"lastname"}
 	     this one for repalce { "op":"replace", "path": "/customer/{id}/lastname", "value":"Newtom"}
       **********************  -->
         <invoke object-ref="zingDBFacade" method="patchCustomers" doc:name="PATCH Customers" methodArguments="#[flowVars.key], #[payload]"/>
+       
         <scripting:component doc:name="Script">
-            <scripting:script engine="Groovy"><![CDATA[if(payload instanceof org.mule.transport.NullPayload){
+            <scripting:script engine="Groovy"><![CDATA[if(payload == false){
  throw new org.mule.module.apikit.exception.NotFoundException("Does not exist!");
  }
 	]]></scripting:script>

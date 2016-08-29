@@ -1,31 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
-   
-    <choice-exception-strategy name="global_exception_handlingChoice_Exception_Strategy">
-      
-        <catch-exception-strategy doc:name="Catch Exception Strategy for Others" when="#[exception.causedBy(java.lang.Exception)]">
-            <logger level="ERROR" doc:name="Logger"/>
-        </catch-exception-strategy>
-     
-        <catch-exception-strategy when="exception.causedBy(au.com.zing.exception.BusinessProcessingException)">
-            <logger level="ERROR" doc:name="Logger"/>
-            
-            <!--  Handle Business  Exception using DEAD LETTER QUEUES and RETRY mechanisms --> 
-            
-        </catch-exception-strategy>
-        
-        <rollback-exception-strategy when="exception.causedBy(au.com.zing.exception.NonBusinessException)">
-        
-          <!--  Handle Non Business  Exception using DEAD LETTER QUEUES AND POISON QUEUES--> 
-         
-            <logger level="ERROR" message="Payload failing: #[payload]"/>
-        </rollback-exception-strategy>
-    </choice-exception-strategy>
+
+	<choice-exception-strategy
+		name="global_exception_handlingChoice_Exception_Strategy">
+
+		<catch-exception-strategy doc:name="Catch Exception Strategy for Others"
+			when="#[exception.causedBy(java.lang.Exception)]">
+			<logger level="ERROR" doc:name="Logger" />
+		</catch-exception-strategy>
+
+		<catch-exception-strategy
+			when="exception.causedBy(au.com.zing.exception.BusinessProcessingException)">
+			<logger level="ERROR" doc:name="Logger" />
+
+			<!-- Handle Business Exception using DEAD LETTER QUEUES and RETRY mechanisms -->
+
+		</catch-exception-strategy>
+
+		<rollback-exception-strategy
+			when="exception.causedBy(au.com.zing.exception.NonBusinessException)">
+
+			<!-- Handle Non Business Exception using DEAD LETTER QUEUES AND POISON 
+				QUEUES -->
+
+			<logger level="ERROR" message="Payload failing: #[payload]" />
+		</rollback-exception-strategy>
+	</choice-exception-strategy>
 </mule>

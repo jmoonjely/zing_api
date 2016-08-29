@@ -2,28 +2,39 @@
 
 <mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
 	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
-    <flow name="deletecustomerFlow">
-        <set-variable variableName="key"
-                  value="#[message.inboundProperties.'http.uri.params'.id]" 
-                  doc:name="Variable"/>
-        <logger message="#[flowVars.logprefix] - Key - #[flowVars.key]" level="INFO" doc:name="Log key"/>
-        <!-- This is a bean class is only used as a facade to hide the DB processing in this POC.
-        This class will take care of all the Database processing operations -->
-        <invoke object-ref="zingDBFacade" method="deleteCustomer" doc:name="DBFacade for DB processing" methodArguments="#[flowVars.key]"/>
-        <scripting:component doc:name="Script">
-            <scripting:script engine="Groovy"><![CDATA[if(payload == false){
+
+
+	<flow name="deletecustomerFlow">
+		<set-variable variableName="key"
+			value="#[message.inboundProperties.'http.uri.params'.id]" doc:name="Variable" />
+		<logger message="#[flowVars.logprefix] - Key - #[flowVars.key]"
+			level="INFO" doc:name="Log key" />
+
+		<!-- This is a bean class is only used as a facade to hide the DB processing.
+			This class will take care of all the Database processing operations -->
+
+		<invoke object-ref="zingDBFacade" method="deleteCustomer"
+			doc:name="DBFacade for DB processing" methodArguments="#[flowVars.key]" />
+
+		<scripting:component doc:name="Script">
+			<scripting:script engine="Groovy"><![CDATA[if(payload == false){
  throw new org.mule.module.apikit.exception.NotFoundException("Does not exist!");
  }
 	]]></scripting:script>
-        </scripting:component>
-        <set-payload value="#[flowVars.key]" doc:name="Set Payload"/>
-        <flow-ref name="pushToCustomerQueueFlow" doc:name="Flow Ref- PUSH TO QUEUE FOR sync"/>
-        <logger message="#[flowVars.logprefix] - Deleted completed" level="INFO" doc:name="Log Completed"/>
-         
-    </flow>
+		</scripting:component>
+		<set-payload value="#[flowVars.key]" doc:name="Set Payload" />
+
+		<!-- Call the flow to perform the place the udpated customer details in 
+			the queue for target system processing -->
+
+		<flow-ref name="pushToCustomerQueueFlow" doc:name="Flow Ref- PUSH TO QUEUE FOR sync" />
+
+		<logger message="#[flowVars.logprefix] - Deleted completed"
+			level="INFO" doc:name="Log Completed" />
+
+	</flow>
 </mule>

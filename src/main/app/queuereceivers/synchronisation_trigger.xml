@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:schedulers="http://www.mulesoft.org/schema/mule/schedulers" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:schedulers="http://www.mulesoft.org/schema/mule/schedulers"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/schedulers http://www.mulesoft.org/schema/mule/schedulers/current/mule-schedulers.xsd">
-    <flow name="synchronisation_triggerFlow">
-        <poll doc:name="Poll">
-            <schedulers:cron-scheduler expression="0 0/5 * * * ?"/>
-            <logger level="INFO" doc:name="Logger"/>
-        </poll>
-        <set-variable variableName="logprefix" value="#[java.util.UUID.randomUUID().toString()]" doc:name="logprefix - Variable"/>
-        <logger message="#[flowVars.logprefix] : Job started" level="INFO" doc:name="Log - Job started"/>
-        <flow-ref name="process_queue_messageFlow" doc:name="process_queue_messageFlow"/>
-    </flow>
+
+	<!-- Flow to trigger the sync of customer udpates to down stream systems. 
+		This needs to have the logic to start and stop the queues This will be achieved 
+		by keep the flow in a stopped state and starting it based on predefined interval 
+		in this case every 5 minutes -->
+
+	<flow name="synchronisation_triggerFlow">
+		<poll doc:name="Poll">
+			<schedulers:cron-scheduler expression="0 0/5 * * * ?" />
+			<logger level="INFO" doc:name="Logger" />
+		</poll>
+		<set-variable variableName="logprefix"
+			value="#[java.util.UUID.randomUUID().toString()]" doc:name="logprefix - Variable" />
+		<logger message="#[flowVars.logprefix] : Job started" level="INFO"
+			doc:name="Log - Job started" />
+		<flow-ref name="process_queue_messageFlow" doc:name="process_queue_messageFlow" />
+	</flow>
 </mule>

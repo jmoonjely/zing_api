@@ -8,6 +8,10 @@ import au.com.zing.Customer;
 
 import org.mule.el.datetime.DateTime;
 
+/*
+This is a bean class is only used as a facade to hide the DB processing.
+This class will take care of all the Database processing operations  */
+
 public class ZingDBFacade {
 
 	private HashMap<String, Customer> customeDBMap;
@@ -40,19 +44,24 @@ public class ZingDBFacade {
 	}
 
 	public boolean updateCustomer(String key, Customer value) {
-		return customeDBMap.put(key, value) != value;
+		if(customeDBMap.containsKey(key))
+		  return customeDBMap.put(key, value) != value;
+		else
+			return false;
 
 	}
 
-	// This methods needs to be implemented based on the { "op":"remove","value":"lastname"}
-	//{ "op":"replace", "path": "/customer/{id}/lastname", "value":"Newtom"}
-	// Replace is used to set a new value to a member of the object. It is logically equivalent to a remove operation followed by an add operation to the same path or to an add operation to an existing member.
+	/*This methods needs to be implemented based on the { "op":"remove","value":"lastname"}
+	{ "op":"replace", "path": "/customer/{id}/lastname", "value":"Newtom"}
+	Replace is used to set a new value to a member of the object. 
+	It is logically equivalent to a remove operation followed by an add operation to the same path or to an add operation to an existing member.
+	TODO implement operation as specified in the op on resource*/
 	
-	
-	//TODO implement operation as specified in the op on resource
 	public boolean patchCustomers(String key, String jsonString) {
-		return true;
-
+		if(customeDBMap.containsKey(key))
+			  return true;
+			else
+				return false;
 	}
 
 	public Customer getCustomer(String key) {

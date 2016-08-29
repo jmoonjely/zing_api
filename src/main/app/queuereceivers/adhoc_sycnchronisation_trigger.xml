@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-    <flow name="adhoc_sycnchronisation_triggerFlow">
-        <http:listener config-ref="api-httpListenerConfig" path="/" doc:name="HTTP"/>
-         <set-variable variableName="logprefix" value="#[message.rootId] - #[message.inboundProperties.'http.request.path']" doc:name="log prefix Variable"/>
-        <logger message="#[flowVars.logprefix] : Sync request received." level="INFO" doc:name="Logger"/>
-        <flow-ref name="process_queue_messageFlow" doc:name="process_queue_messageFlow"/>
-        <logger level="INFO" doc:name="Log  adhoc completed" message="#[flowVars.logprefix] : adhoc completed"/>
-    </flow>
+
+	<!-- This config file provide the feature to do call the queue processing 
+		in adhoc basis. -->
+
+	<flow name="adhoc_sycnchronisation_triggerFlow">
+		<http:listener config-ref="api-httpListenerConfig" path="/"
+			doc:name="HTTP" />
+		<set-variable variableName="logprefix"
+			value="#[message.rootId] - #[message.inboundProperties.'http.request.path']"
+			doc:name="log prefix Variable" />
+		<logger message="#[flowVars.logprefix] : Sync request received."
+			level="INFO" doc:name="Log- Sync request received." />
+		<flow-ref name="process_queue_messageFlow" doc:name="process_queue_messageFlow" />
+		<logger level="INFO" doc:name="Log  adhoc completed"
+			message="#[flowVars.logprefix] : adhoc completed" />
+	</flow>
 </mule>

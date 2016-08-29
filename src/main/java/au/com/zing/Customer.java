@@ -2,6 +2,8 @@ package au.com.zing;
 
 import org.mule.el.datetime.DateTime;
 
+// Class for holding the customer object
+
 public class Customer {
 	public Customer(){}
 	public Customer(String id, String firstName, String lastName, String streetAddress, String city, String state,
