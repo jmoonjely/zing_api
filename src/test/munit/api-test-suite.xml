@@ -7,7 +7,11 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     <munit:config doc:name="Munit configuration" mock-connectors="false" mock-inbounds="false"/>    
     <spring:beans>
 	<spring:import resource="classpath:api.xml" />
+	<spring:import resource="classpath:global/global_exception_handling.xml" />
+	<spring:import resource="classpath:global/shared_http_statuscode.xml" />
 	<spring:import resource="classpath:global/shared_resources.xml" />
+	
+	<spring:import resource="classpath:subflows/pushToCustomerQueue.xml" />
 	<spring:import resource="classpath:subflows/putcustomer.xml" />
 	<spring:import resource="classpath:subflows/getcustomer.xml" />
 	<spring:import resource="classpath:subflows/listcustomers.xml" />
